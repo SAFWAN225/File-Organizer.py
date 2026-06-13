@@ -55,6 +55,7 @@ class FileOrganizer:
             raise ValueError(f"Directory does not exist: {directory}")
         if not self.directory.is_dir():
             raise ValueError(f"Path is not a directory: {directory}")
+
     def get_file_category(self, file_path: Path) -> str:
         """
         Determine the category of a file based on its extension.
@@ -68,6 +69,7 @@ class FileOrganizer:
             if extension in extensions:
                 return category
         return 'Others'
+
     def organize(self) -> None:
         """Organize files in the directory."""
         logger.info(f"Starting file organization in: {self.directory}")
@@ -84,6 +86,7 @@ class FileOrganizer:
                 logger.error(f"Error processing file {file.name}: {e}")
                 self.stats['errors'] += 1
         self._print_summary()
+
     def _move_file(self, file: Path, category: str) -> None:
         """
         Move a file to its category directory.
@@ -99,7 +102,7 @@ class FileOrganizer:
                 logger.info(f"Created directory: {category}")
         target_path = target_dir / file.name
         # Handle duplicate filenames
-        if target_path.exists() and target_path != file:
+        if target_path.exists():
             base_name = file.stem
             extension = file.suffix
             counter = 1
@@ -113,6 +116,7 @@ class FileOrganizer:
             shutil.move(str(file), str(target_path))
             logger.info(f"Moved: {file.name} → {category}/")
         self.stats['moved'] += 1
+
     def _print_summary(self) -> None:
         """Print organization summary."""
         logger.info(f"\n{'='*50}")
@@ -120,6 +124,7 @@ class FileOrganizer:
         logger.info(f"  Files moved: {self.stats['moved']}")
         logger.info(f"  Errors encountered: {self.stats['errors']}")
         logger.info(f"{'='*50}\n")
+
     def add_custom_extension(self, category: str, extension: str) -> None:
         """
         Add a custom file extension to a category.
@@ -133,7 +138,8 @@ class FileOrganizer:
             self.file_mapping[category] = []
         if extension not in self.file_mapping[category]:
             self.file_mapping[category].append(extension)
-            logger.info(f"Added {extension} to {category} category"
+            logger.info(f"Added {extension} to {category} category")
+
     def get_statistics(self) -> Dict:
         """Get file type statistics for the directory."""
         stats = {}
@@ -169,7 +175,7 @@ def main():
         metavar=('CATEGORY', 'EXTENSION'),
         help='Add a custom extension mapping (e.g., --add-extension Documents .md)'
     )
-    args = parser.parse_args(
+    args = parser.parse_args()
     try:
         organizer = FileOrganizer(
             args.directory,
